@@ -147,7 +147,8 @@ price_protection:
   window_days: {normal: 7, silver: 7, gold: 15}
   day_one: payment_day
   excluded_price_types: [flash_sale, group_buy, live_only, clearance]
-  excluded_order_kinds: [presale, gift]
+  excluded_order_kinds: [presale]
+  excluded_items: [gift]                # 只排除赠品这一行，含赠品订单的正价商品仍可价保
   max_per_order_item: 1
   payout_to: balance
 
@@ -238,6 +239,9 @@ business_calendar:                      # NEW 用于“工作日”计算
 | C4 | 代收的“签收时间”是否也适用于 24h/48h 时限 | 一律用入柜/入站时间 | P01 明确“视为签收时间” |
 | C5 | 保修“1 年”的最后一天 | 签收日的次年同日减一天，当日 23:59:59 止 | “签收当日起算”的直接含义 |
 | C6 | 工作日 | 周一至周五，除 `holidays`，不模拟调休 | 简单且可复现 |
+| C7 | 积分怎么算 | 每实付 1 元得 1 分 × 倍率，向下取整；金星生日当月为 2 倍，不是 1.5 × 2 | P07 只写“双倍积分”，取字面 |
+| C8 | 楼层费按件还是按单 | 整单收一次 | P05 按楼层描述，未提件数 |
+| C9 | 时限边界 | 24、48 小时都含整点 | “内”的通常含义 |
 
 ## 2. 领域模型
 
@@ -479,7 +483,7 @@ Token 见 `.env.example`，分 `cs-agent`（学习者使用，有范围限制）
 | POST `/aftersale/v1/invoices/{id}/reissue` | `title, tax_no` | 新发票 | 42234 | 键 |
 | GET `/aftersale/v1/invoices` | `user_id*, order_id` | 列表 | | 只读 |
 
-规则错误码（`code` 为 42200 段，`rule_code` 为字符串，`detail` 含 `deadline_at, policy_key, policy_version`）：
+规则错误一律返回 HTTP 422。错误体为 `{code, message, rule_code, detail, data: null, request_id}`，`code` 在 42200 段，`detail` 含 `deadline_at, policy_key, policy_version`。规则码：
 
 `AS_WINDOW_EXPIRED`、`AS_APPLY_LIMIT`、`AS_NOT_RETURNABLE_CATEGORY`、`AS_ACTIVATED`、`AS_OPENED`、`AS_SEAL_REMOVED`、`AS_DETAIL_OVERRIDE`、`AS_REFUND_NOT_ALLOWED_TIER`、`AS_FRESH_CLAIM_EXPIRED`、`AS_EXCHANGE_LIMIT`、`AS_EXCHANGE_NOT_SUPPORTED`、`AS_EVIDENCE_REQUIRED`、`AS_INSPECTION_REPORT_REQUIRED`、`AS_NOT_DELIVERED`
 
@@ -619,7 +623,7 @@ ticket    → member（优先级）
 | POST `/scenarios/{id}/verify` | 校验当前状态是否满足 `preconditions` |
 | GET `/manifest` | 种子、N、数据哈希、版本 |
 
-每个业务服务暴露内部接口 `/_sim/{sync,tick,reset,events}`，只接受 `internal` token，不进 OpenAPI。
+每个业务服务暴露内部接口 `/_sim/{sync,tick,reset,events}`，只接受 `internal` token，不进 OpenAPI。服务向 control 上报事件走 `POST /control/_sim/report`，同样只接受 `internal` token。control 的响应风格沿用 ticket。
 
 ### 6.2 故障规则
 
