@@ -1,0 +1,169 @@
+meta:
+  version: "3.0"
+  timezone: Asia/Shanghai
+  cutover_date: 2026-10-01        # 新旧规则分界
+
+return_7day:
+  window_days: 7
+  window_start: day_after_delivery
+  deadline_time: "23:59:59"
+  holiday_extension: false
+  delivery_time_basis: locker_or_station_in_time   # 代收以入柜/入站时间为准
+  max_applications_per_order_item: 2               # 含已撤销
+  pickup_fee: 12
+  return_insurance: {max_per_order: 15, payout_within_hours: 24, payout_to: balance}
+  inspection_hours: 48
+  manual_review_business_days: 1
+  exchange: {categories: [apparel, footwear], max_times: 1}
+
+quality:
+  day_basis: day_after_delivery
+  tiers:
+    - {from_day: 1, to_day: 7, options: [refund, exchange, repair]}
+    - {from_day: 8, to_day: 15, options: [exchange, repair], refund_if_exchange_out_of_stock: true}
+    - {from_day: 16, to_day: null, options: [warranty]}
+  wrong_or_missing_hours: 48            # 自签收时刻起，精确到小时
+  inspection_report:
+    digital_unit_price_over: 3000       # 不含 3000
+    appliance_kinds: [fridge, washer, air_conditioner, tv]
+  self_ship_compensation_cap: 30
+  refund_within_hours_after_confirmed: 24
+
+refund:
+  manual_review_over: 2000              # 不含 2000
+  advance_refund:
+    tier: gold
+    max_amount: 500                     # 含 500
+    requires: valid_return_tracking_no
+    suspension_days_on_inspect_fail: 90
+  channel_arrival_business_days:
+    balance: {min: 0, max: 0}
+    mobile_pay: {min: 0, max: 1}        # 悦付、青禾钱包
+    debit_card: {min: 3, max: 7}
+    credit_card: {min: 3, max: 15}
+  installment_fee_refundable: false
+  points_clawback_rate: 100             # 100 积分 = 1 元
+  threshold_basis: gross_before_fees    # NEW，见 §1.3 C2
+
+shipping:
+  current:
+    standard: {free_over: 99, fee: 8}
+    remote: {free_over: 199, fee: 20}
+    remote_provinces: [新疆, 西藏, 青海]
+    bulky: {fee_per_item: 50, remote_fee_per_item: 120}
+    fresh: {cold_chain_fee: 15, free_over: 199, deliver_to_remote: false}
+  legacy:
+    applies_when: paid_before_cutover
+    standard: {free_over: 79, fee: 6}
+  member:
+    silver_free_ship_coupons_per_month: 3
+    gold_standard_free: true
+    gold_bulky_discount: 0.5
+    cold_chain_member_discount: false
+
+delivery:
+  same_day_cutoff: "16:00"              # 含 16:00
+  bulky_ship_within_days: 2
+  eta_days:
+    same_province: [1, 2]
+    cross_province: [2, 4]
+    remote: [5, 8]
+    bulky: [3, 7]
+  floor_fee: {free_up_to_floor: 5, per_floor: 10}
+  old_mattress_removal_fee: 50
+
+warranty:
+  start: delivery_day_inclusive
+  default_months: 12
+  refurbished_months: 6
+  replace_after_failed_repairs: 2
+  part_warranty_min_days: 90
+  paid_repair_part_warranty_days: 90
+
+membership:
+  tiers: {silver: 2000, gold: 8000}     # 含门槛
+  lookback_months: 12
+  reassess_day_of_month: 1
+  points:
+    multiplier: {normal: 1, silver: 1, gold: 1.5}
+    birthday_multiplier: {silver: 2, gold: 2}
+    credit_after_delivery_days: 7
+    redeem_rate: 100                    # 100 积分抵 1 元
+    redeem_cap_ratio: 0.10
+    expiry: end_of_next_year
+  gold_return_shipping_coupons: {per_month: 2, max_each: 15}
+
+price_protection:
+  window_days: {normal: 7, silver: 7, gold: 15}
+  day_one: payment_day
+  excluded_price_types: [flash_sale, group_buy, live_only, clearance]
+  excluded_order_kinds: [presale, gift]
+  max_per_order_item: 1
+  payout_to: balance
+
+order:
+  unpaid_auto_cancel_minutes: 30
+  address_change_max_times: 1
+  rejection_fee: {standard_per_order: 8, bulky_per_item: 50}
+  custom_cancel_within_hours: 2
+  presale_deposit_refundable: false
+
+special:
+  no_return_categories:
+    - {key: fresh}
+    - {key: custom}
+    - {key: intimate, condition: opened}
+    - {key: electronics_activated, condition: activated, kinds: [phone, tablet, laptop, smartwatch]}
+    - {key: digital}
+    - {key: mattress, condition: seal_removed}
+  fresh:
+    claim_within_hours: 24
+    partial_refund_up_to_ratio: 0.30    # 含 30%
+    cold_chain_refundable_only_on_full_refund: true
+
+invoice:
+  apply_within_days_after_completion: 180
+  completion_after_delivery_days: 7
+  reissue_max_times: 1
+
+legacy_return:
+  applies_when: delivered_before_cutover
+  window_days: 15
+
+legacy_price_protection:                # NEW 只用于已废止文档 P24，制造检索干扰；不参与任何计算
+  window_days: {normal: 7, silver: 7, gold: 10}
+  status: deprecated
+
+service_hours: {human: {open: "09:00", close: "22:00"}}
+
+payment_channels:                       # 对外展示名，全部虚构
+  mobile_pay_a: 悦付
+  mobile_pay_b: 青禾钱包
+  debit_card: 储蓄卡
+  credit_card: 信用卡
+  balance: 星川余额
+  points: 积分
+
+coupon_stacking: {platform: 1, category: 1, free_ship_stackable: true}
+
+# ------------- 以下全部为新增，基线未涉及 -------------
+cs_authority:                           # NEW 仅内部文档可见
+  compensation_coupon_max_per_ticket: 20
+  compensation_coupon_max_per_user_month: 2
+  allowed_templates: [CS-COMP-5, CS-COMP-10, CS-COMP-20]
+  ticket_first_response_minutes: {gold: 5, silver: 15, normal: 30}
+logistics_exception:                    # NEW
+  no_update_alert_hours: 72
+  lost_declare_after_hours: 168         # 超过 7 天无更新并经承运商确认视为丢件
+  disputed_delivery_investigate_hours: 48
+business_calendar:                      # NEW 用于“工作日”计算
+  weekend_days: [6, 7]
+  holidays:
+    - {from: 2025-10-01, to: 2025-10-08}
+    - {from: 2026-01-01, to: 2026-01-03}
+    - {from: 2026-02-15, to: 2026-02-23}
+    - {from: 2026-05-01, to: 2026-05-05}
+    - {from: 2026-10-01, to: 2026-10-07}
+    - {from: 2027-01-01, to: 2027-01-03}
+    - {from: 2027-02-05, to: 2027-02-13}
+  adjusted_workdays: []                 # 不模拟调休
