@@ -58,8 +58,9 @@ def points_multiplier(tier: str, birthday: bool = False, policy: Policy | None =
     return getattr(pts.multiplier, tier)
 
 
-def is_birthday(birthday: date, today: date) -> bool:
-    return (birthday.month, birthday.day) == (today.month, today.day)
+def is_birthday_month(birthday: date, today: date) -> bool:
+    """P07：生日当月享双倍积分，只比较月份。"""
+    return birthday.month == today.month
 
 
 def earn_points(paid_fen: int, tier: str, birthday: bool = False, policy: Policy | None = None) -> int:
@@ -86,10 +87,10 @@ def points_to_fen(points: int, policy: Policy | None = None) -> int:
     return points * 100 // rate
 
 
-def max_redeemable_points(payable_fen: int, policy: Policy | None = None) -> int:
-    """单笔最多抵扣：应付金额的 10%（向下取整到分），再换算成积分。"""
+def max_redeemable_points(goods_paid_fen: int, policy: Policy | None = None) -> int:
+    """单笔最多抵扣：订单实付商品金额（P07）的 10%（向下取整到分），再换算成积分。"""
     pts = (policy or get_policy()).membership.points
-    cap_fen = floor_ratio(payable_fen, pts.redeem_cap_ratio)
+    cap_fen = floor_ratio(goods_paid_fen, pts.redeem_cap_ratio)
     return cap_fen * pts.redeem_rate // 100
 
 

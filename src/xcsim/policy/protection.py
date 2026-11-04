@@ -18,10 +18,10 @@ def price_protection_window_days(tier: str, policy: Policy | None = None) -> int
 @dataclass(frozen=True)
 class PriceProtectionResult:
     eligible: bool
-    reason: str | None  # None / window / price_type / order_kind / no_diff
+    reason: str | None  # None / window / price_type / order_kind / gift_item / returned / no_diff
     day_k: int
     window_days: int
-    diff_fen: int
+    diff_fen: int  # 总差额（已乘数量）
 
 
 def price_protection(
@@ -33,11 +33,15 @@ def price_protection(
     current_price_fen: int,
     current_price_type: str,
     order_kind: str = "normal",
+    is_gift: bool = False,
+    qty: int = 1,
+    has_return_application: bool = False,
     policy: Policy | None = None,
 ) -> PriceProtectionResult:
     """价保判断。付款当日为第 1 天；差额 = 实付单价 - 现价（实付含券后）。
 
-    秒杀、拼团、直播专享、清仓价不适用；预售、含赠品订单不适用。
+    秒杀、拼团、直播专享、清仓价不适用；预售订单、赠品行、已申请退货的商品不适用。
+    差额按 P08 乘以数量；paid_unit_fen 是分摊优惠后的实付单价。
     """
     p = policy or get_policy()
     rule = p.price_protection
@@ -51,13 +55,16 @@ def price_protection(
         return result(False, "window")
     if current_price_type in rule.excluded_price_types:
         return result(False, "price_type")
-    # 订单模型里的赠品订单叫 gift_included，policy 里写作 gift，两种写法都认
-    if order_kind in rule.excluded_order_kinds or order_kind.removesuffix("_included") in rule.excluded_order_kinds:
+    if order_kind in rule.excluded_order_kinds:
         return result(False, "order_kind")
-    diff = paid_unit_fen - current_price_fen
-    if diff <= 0:
+    if is_gift and "gift" in rule.excluded_items:  # 只排除赠品这一行，订单里的正价行仍可价保
+        return result(False, "gift_item")
+    if has_return_application:
+        return result(False, "returned")
+    unit_diff = paid_unit_fen - current_price_fen
+    if unit_diff <= 0:
         return result(False, "no_diff")
-    return result(True, None, diff)
+    return result(True, None, unit_diff * qty)  # P08：（实付单价 − 现价）× 数量
 
 
 # ---------------------------------------------------------------- 保修
@@ -88,6 +95,15 @@ def part_warranty_end(start_at: datetime, days: int, policy: Policy | None = Non
 def paid_repair_warranty_end(repaired_at: datetime, policy: Policy | None = None) -> datetime:
     p = policy or get_policy()
     return part_warranty_end(repaired_at, p.warranty.paid_repair_part_warranty_days, p)
+
+
+def repair_part_warranty_end(
+    repaired_at: datetime, whole_warranty_end: datetime, policy: Policy | None = None
+) -> datetime:
+    """P06：保修期内维修更换的部件，保修期为整机剩余保修期与 90 天中较长者。"""
+    p = policy or get_policy()
+    part_end = part_warranty_end(repaired_at, p.warranty.part_warranty_min_days, p)
+    return max(part_end, to_bj(whole_warranty_end, p))
 
 
 def replacement_due(failed_repairs: int, policy: Policy | None = None) -> bool:

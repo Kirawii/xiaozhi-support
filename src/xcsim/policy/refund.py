@@ -81,9 +81,15 @@ def arrival_eta(
 
 
 def points_refund_amount(value_fen: int, policy: Policy | None = None) -> int:
-    """积分抵扣部分退回多少积分（100 积分 = 1 元，即 1 分 = 1 积分）。"""
-    rate = (policy or get_policy()).refund.points_clawback_rate
+    """积分抵扣部分退回多少积分（100 积分 = 1 元，用 membership.points.redeem_rate）。"""
+    rate = (policy or get_policy()).membership.points.redeem_rate
     return value_fen * rate // 100
+
+
+def clawback_shortfall_deduction_fen(shortfall_points: int, policy: Policy | None = None) -> int:
+    """P03：积分余额不足扣回的部分，按 100 积分 = 1 元从退款中扣除（返回分）。"""
+    rate = (policy or get_policy()).refund.points_clawback_rate
+    return max(shortfall_points, 0) * 100 // rate
 
 
 def installment_fee_refundable(policy: Policy | None = None) -> bool:

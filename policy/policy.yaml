@@ -97,7 +97,8 @@ price_protection:
   window_days: {normal: 7, silver: 7, gold: 15}
   day_one: payment_day
   excluded_price_types: [flash_sale, group_buy, live_only, clearance]
-  excluded_order_kinds: [presale, gift]
+  excluded_order_kinds: [presale]
+  excluded_items: [gift]                # 只排除赠品这一行，含赠品订单的正价商品仍可价保
   max_per_order_item: 1
   payout_to: balance
 

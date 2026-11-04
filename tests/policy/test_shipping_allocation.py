@@ -107,10 +107,18 @@ def test_gold_bulky_half_off_and_silver_not():
     assert fee([ShipLine("bulky", 0, 1)], tier="silver").bulky_fee_fen == 5000
 
 
-def test_gold_standard_free_except_remote():
+def test_gold_standard_free_everywhere_including_remote():
+    # P04 七.2：金星普通商品全国无门槛包邮（含偏远地区）
     assert fee(normal(5000), tier="gold").shipping_fee_fen == 0
-    assert fee(normal(5000), province="青海", tier="gold").shipping_fee_fen == 2000
+    assert fee(normal(5000), province="青海", tier="gold").shipping_fee_fen == 0
+    assert fee(normal(100), province="新疆", tier="gold").shipping_fee_fen == 0
     assert fee(normal(5000), tier="silver").shipping_fee_fen == 800
+    assert fee(normal(5000), province="青海", tier="silver").shipping_fee_fen == 2000
+
+
+def test_silver_free_ship_coupon_also_covers_remote():
+    # P04 七.1：免邮券可抵扣一单普通商品运费（含偏远地区）
+    assert fee(normal(5000), province="西藏", tier="silver", free_ship_coupon=True).shipping_fee_fen == 0
 
 
 def test_free_ship_coupon_waives_standard_only():

@@ -217,6 +217,7 @@ class PriceProtection(_M):
     day_one: str
     excluded_price_types: tuple[str, ...]
     excluded_order_kinds: tuple[str, ...]
+    excluded_items: tuple[str, ...]
     max_per_order_item: int
     payout_to: str
 

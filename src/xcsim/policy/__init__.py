@@ -4,7 +4,7 @@ from .loader import default_policy_path, get_policy, load_policy
 from .membership import (
     clawback_points,
     earn_points,
-    is_birthday,
+    is_birthday_month,
     max_redeemable_points,
     next_assessment_at,
     points_available_at,
@@ -23,6 +23,7 @@ from .protection import (
     paid_repair_warranty_end,
     part_warranty_end,
     price_protection,
+    repair_part_warranty_end,
     price_protection_window_days,
     replacement_due,
     warranty_end,
@@ -39,6 +40,7 @@ from .quality import (
 from .refund import (
     advance_refund_decision,
     arrival_eta,
+    clawback_shortfall_deduction_fen,
     manual_review_due_at,
     needs_manual_review,
     points_refund_amount,

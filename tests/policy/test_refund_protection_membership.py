@@ -13,7 +13,9 @@ from xcsim.policy import (
     earn_points,
     in_warranty,
     invoice_deadline,
-    is_birthday,
+    is_birthday_month,
+    clawback_shortfall_deduction_fen,
+    repair_part_warranty_end,
     manual_review_due_at,
     max_redeemable_points,
     needs_manual_review,
@@ -117,14 +119,35 @@ def test_arrival_eta_unknown_channel():
 
 
 def test_points_refund_one_point_per_fen():
-    assert points_refund_amount(500) == 500
+    assert points_refund_amount(500) == 500  # 5 元积分抵扣 = 500 积分
     assert points_refund_amount(0) == 0
 
 
+def test_p03_shortfall_points_deducted_from_refund_at_100_points_per_yuan():
+    assert clawback_shortfall_deduction_fen(250) == 250  # 差 250 积分 -> 2.50 元
+    assert clawback_shortfall_deduction_fen(100) == 100  # 1 元
+    assert clawback_shortfall_deduction_fen(1) == 1
+    assert clawback_shortfall_deduction_fen(0) == 0
+    assert clawback_shortfall_deduction_fen(-5) == 0
+
+
+def test_points_functions_follow_their_own_policy_keys(tmp_path, monkeypatch):
+    import yaml
+    from pathlib import Path
+
+    raw = yaml.safe_load((Path(__file__).resolve().parents[2] / "policy" / "policy.yaml").read_text(encoding="utf-8"))
+    raw["refund"]["points_clawback_rate"] = 50  # 只改扣回比例
+    f = tmp_path / "m.yaml"
+    f.write_text(yaml.safe_dump(raw, allow_unicode=True), encoding="utf-8")
+    monkeypatch.setenv("XC_POLICY_PATH", str(f))
+    assert clawback_shortfall_deduction_fen(250) == 500  # 随 points_clawback_rate 变化
+    assert points_refund_amount(500) == 500  # 退回积分只看 redeem_rate，不受影响
+
+
 # ------------------------------------------------------------ 价保（PPR）
-def pp(tier="normal", paid=bj(2026, 10, 26, 9), unit=20000, cur=18900, ptype="regular", kind="normal"):
+def pp(tier="normal", paid=bj(2026, 10, 26, 9), unit=20000, cur=18900, ptype="regular", kind="normal", **kw):
     return price_protection(
-        tier=tier, paid_at=paid, now=N, paid_unit_fen=unit, current_price_fen=cur, current_price_type=ptype, order_kind=kind
+        tier=tier, paid_at=paid, now=N, paid_unit_fen=unit, current_price_fen=cur, current_price_type=ptype, order_kind=kind, **kw
     )
 
 
@@ -159,9 +182,27 @@ def test_promo_price_type_is_allowed():
     assert pp(ptype="promo").eligible
 
 
-@pytest.mark.parametrize("kind", ["presale", "gift", "gift_included"])
-def test_excluded_order_kinds(kind):
-    assert pp(kind=kind).reason == "order_kind"
+def test_presale_orders_excluded():
+    assert pp(kind="presale").reason == "order_kind"
+
+
+def test_gift_row_excluded_but_full_price_row_in_same_order_allowed():
+    # P08 三.4：赠品不适用；含赠品订单里的正价商品仍可价保
+    assert pp(kind="gift_included", is_gift=True).reason == "gift_item"
+    r = pp(kind="gift_included", is_gift=False)
+    assert r.eligible and r.diff_fen == 1100
+
+
+def test_item_with_return_application_excluded():
+    assert pp(has_return_application=True).reason == "returned"
+
+
+def test_diff_is_multiplied_by_quantity():
+    # P08 二.1：（实付单价 − 申请时售价）× 数量 = (200.00 − 189.00) × 3
+    r = pp(qty=3)
+    assert r.eligible and r.diff_fen == 3300
+    assert pp(qty=2, unit=20000, cur=18900).diff_fen == 2200
+    assert pp(qty=5, unit=18900, cur=18900).diff_fen == 0
 
 
 def test_ppr05_coupon_paid_already_below_current_price():
@@ -201,6 +242,16 @@ def test_warranty_end_clamps_for_month_end_signing():
 def test_part_and_paid_repair_warranty_are_inclusive_of_start_day():
     assert part_warranty_end(bj(2026, 10, 1, 9), 90) == bj(2026, 12, 29, 23, 59, 59)
     assert paid_repair_warranty_end(bj(2026, 11, 1, 9)) == bj(2027, 1, 29, 23, 59, 59)
+
+
+def test_p06_repaired_part_gets_the_longer_of_remaining_whole_warranty_and_90_days():
+    repaired = bj(2026, 11, 1, 10)
+    # 整机还剩很久（到 2027-06-30）：比 90 天长，取整机剩余期
+    assert repair_part_warranty_end(repaired, bj(2027, 6, 30, 23, 59, 59)) == bj(2027, 6, 30, 23, 59, 59)
+    # 整机只剩 14 天（到 2026-11-15）：不足 90 天，取 90 天（含维修当日，到 2027-01-29）
+    assert repair_part_warranty_end(repaired, bj(2026, 11, 15, 23, 59, 59)) == bj(2027, 1, 29, 23, 59, 59)
+    # 整机今天到期：同样取 90 天
+    assert repair_part_warranty_end(repaired, bj(2026, 11, 1, 23, 59, 59)) == bj(2027, 1, 29, 23, 59, 59)
 
 
 def test_replacement_after_two_failed_repairs():
@@ -261,9 +312,13 @@ def test_earn_points_floor():
     assert earn_points(100, "normal") == 1
 
 
-def test_is_birthday():
-    assert is_birthday(date(1990, 11, 1), date(2026, 11, 1))
-    assert not is_birthday(date(1990, 11, 2), date(2026, 11, 1))
+def test_birthday_benefit_applies_for_the_whole_birthday_month():
+    # P07：生日当月双倍积分，只看月份
+    assert is_birthday_month(date(1990, 11, 1), date(2026, 11, 1))
+    assert is_birthday_month(date(1990, 11, 30), date(2026, 11, 1))
+    assert is_birthday_month(date(1990, 11, 2), date(2026, 11, 30))
+    assert not is_birthday_month(date(1990, 10, 31), date(2026, 11, 1))
+    assert not is_birthday_month(date(1990, 12, 1), date(2026, 11, 30))
 
 
 def test_mem03_points_credited_exactly_seven_days_after_signing():

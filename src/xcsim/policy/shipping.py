@@ -78,7 +78,7 @@ def calc_shipping(
     """混合订单分别计费：普通、大件、生鲜各算各的。
 
     - 版本按付款时间；旧版 79/6 覆盖全部普通商品含偏远，大件和冷链沿用现行数字（C1）。
-    - 金星：非偏远的普通运费免；大件 5 折。银星免邮券（free_ship_coupon）免普通运费。
+    - 金星：普通运费全国免（含偏远，P04）；大件 5 折。银星免邮券（free_ship_coupon）免普通运费。
     - 冷链费不享受会员优惠。楼层费整单只收一次，仅大件。
     """
     p = policy or get_policy()
@@ -101,7 +101,7 @@ def calc_shipping(
             rule = cur.remote if remote else cur.standard
         if normal_amount < fen(rule.free_over):
             standard_fee = fen(rule.fee)
-        gold_free = p.shipping.member.gold_standard_free and tier == "gold" and not remote
+        gold_free = p.shipping.member.gold_standard_free and tier == "gold"
         if gold_free or (free_ship_coupon and p.coupon_stacking.free_ship_stackable):
             standard_fee = 0
 
