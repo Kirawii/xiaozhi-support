@@ -1,0 +1,1061 @@
+{
+  "components": {
+    "schemas": {
+      "ErrorBody": {
+        "additionalProperties": false,
+        "properties": {
+          "errorCode": {
+            "title": "Errorcode",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "errorCode",
+          "message"
+        ],
+        "title": "ErrorBody",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "InventoryResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "available": {
+            "title": "Available",
+            "type": "integer"
+          },
+          "byWarehouse": {
+            "items": {
+              "$ref": "#/components/schemas/WarehouseStock"
+            },
+            "title": "Bywarehouse",
+            "type": "array"
+          },
+          "skuId": {
+            "title": "Skuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "skuId",
+          "available",
+          "byWarehouse"
+        ],
+        "title": "InventoryResponse",
+        "type": "object"
+      },
+      "PriceHistoryItem": {
+        "additionalProperties": false,
+        "properties": {
+          "price": {
+            "title": "Price",
+            "type": "string"
+          },
+          "priceType": {
+            "title": "Pricetype",
+            "type": "string"
+          },
+          "validFrom": {
+            "title": "Validfrom",
+            "type": "string"
+          },
+          "validTo": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Validto"
+          }
+        },
+        "required": [
+          "price",
+          "priceType",
+          "validFrom"
+        ],
+        "title": "PriceHistoryItem",
+        "type": "object"
+      },
+      "PriceHistoryResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/PriceHistoryItem"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "skuId": {
+            "title": "Skuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "skuId",
+          "items"
+        ],
+        "title": "PriceHistoryResponse",
+        "type": "object"
+      },
+      "SkuDetail": {
+        "additionalProperties": false,
+        "properties": {
+          "currentPrice": {
+            "title": "Currentprice",
+            "type": "string"
+          },
+          "listPrice": {
+            "title": "Listprice",
+            "type": "string"
+          },
+          "priceType": {
+            "title": "Pricetype",
+            "type": "string"
+          },
+          "skuId": {
+            "title": "Skuid",
+            "type": "string"
+          },
+          "spuId": {
+            "title": "Spuid",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "skuId",
+          "spuId",
+          "listPrice",
+          "currentPrice",
+          "priceType",
+          "status"
+        ],
+        "title": "SkuDetail",
+        "type": "object"
+      },
+      "SkuInfo": {
+        "additionalProperties": false,
+        "properties": {
+          "barcode": {
+            "title": "Barcode",
+            "type": "string"
+          },
+          "currentPrice": {
+            "title": "Currentprice",
+            "type": "string"
+          },
+          "listPrice": {
+            "title": "Listprice",
+            "type": "string"
+          },
+          "priceType": {
+            "title": "Pricetype",
+            "type": "string"
+          },
+          "skuId": {
+            "title": "Skuid",
+            "type": "string"
+          },
+          "spec": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Spec",
+            "type": "object"
+          },
+          "spuId": {
+            "title": "Spuid",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "weightG": {
+            "title": "Weightg",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "skuId",
+          "spuId",
+          "spec",
+          "listPrice",
+          "currentPrice",
+          "priceType",
+          "barcode",
+          "weightG",
+          "status"
+        ],
+        "title": "SkuInfo",
+        "type": "object"
+      },
+      "SpuDetail": {
+        "additionalProperties": false,
+        "properties": {
+          "attributes": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Attributes",
+            "type": "object"
+          },
+          "brand": {
+            "title": "Brand",
+            "type": "string"
+          },
+          "categoryId": {
+            "title": "Categoryid",
+            "type": "string"
+          },
+          "detailAftersaleOverride": {
+            "anyOf": [
+              {
+                "additionalProperties": true,
+                "type": "object"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Detailaftersaleoverride"
+          },
+          "hasSeal": {
+            "title": "Hasseal",
+            "type": "boolean"
+          },
+          "isBulky": {
+            "title": "Isbulky",
+            "type": "boolean"
+          },
+          "isCustom": {
+            "title": "Iscustom",
+            "type": "boolean"
+          },
+          "isDigital": {
+            "title": "Isdigital",
+            "type": "boolean"
+          },
+          "isFresh": {
+            "title": "Isfresh",
+            "type": "boolean"
+          },
+          "isIntimate": {
+            "title": "Isintimate",
+            "type": "boolean"
+          },
+          "isRefurbished": {
+            "title": "Isrefurbished",
+            "type": "boolean"
+          },
+          "kbDocIds": {
+            "items": {
+              "type": "string"
+            },
+            "title": "Kbdocids",
+            "type": "array"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "partWarranty": {
+            "additionalProperties": true,
+            "title": "Partwarranty",
+            "type": "object"
+          },
+          "requiresActivation": {
+            "title": "Requiresactivation",
+            "type": "boolean"
+          },
+          "shipFrom": {
+            "title": "Shipfrom",
+            "type": "string"
+          },
+          "skus": {
+            "items": {
+              "$ref": "#/components/schemas/SkuInfo"
+            },
+            "title": "Skus",
+            "type": "array"
+          },
+          "spuId": {
+            "title": "Spuid",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "warrantyMonths": {
+            "title": "Warrantymonths",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "spuId",
+          "name",
+          "categoryId",
+          "brand",
+          "kind",
+          "isBulky",
+          "isFresh",
+          "isDigital",
+          "isCustom",
+          "isIntimate",
+          "isRefurbished",
+          "requiresActivation",
+          "hasSeal",
+          "warrantyMonths",
+          "partWarranty",
+          "kbDocIds",
+          "shipFrom",
+          "status",
+          "attributes",
+          "skus"
+        ],
+        "title": "SpuDetail",
+        "type": "object"
+      },
+      "SpuListResponse": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/SpuSummary"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "nextCursor": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Nextcursor"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "SpuListResponse",
+        "type": "object"
+      },
+      "SpuSummary": {
+        "additionalProperties": false,
+        "properties": {
+          "brand": {
+            "title": "Brand",
+            "type": "string"
+          },
+          "categoryId": {
+            "title": "Categoryid",
+            "type": "string"
+          },
+          "isBulky": {
+            "title": "Isbulky",
+            "type": "boolean"
+          },
+          "isDigital": {
+            "title": "Isdigital",
+            "type": "boolean"
+          },
+          "isFresh": {
+            "title": "Isfresh",
+            "type": "boolean"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "minPrice": {
+            "title": "Minprice",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "spuId": {
+            "title": "Spuid",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "spuId",
+          "name",
+          "categoryId",
+          "brand",
+          "kind",
+          "isBulky",
+          "isFresh",
+          "isDigital",
+          "minPrice",
+          "status"
+        ],
+        "title": "SpuSummary",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      },
+      "WarehouseStock": {
+        "additionalProperties": false,
+        "properties": {
+          "available": {
+            "title": "Available",
+            "type": "integer"
+          },
+          "onHand": {
+            "title": "Onhand",
+            "type": "integer"
+          },
+          "province": {
+            "title": "Province",
+            "type": "string"
+          },
+          "reserved": {
+            "title": "Reserved",
+            "type": "integer"
+          },
+          "warehouseId": {
+            "title": "Warehouseid",
+            "type": "string"
+          },
+          "warehouseName": {
+            "title": "Warehousename",
+            "type": "string"
+          }
+        },
+        "required": [
+          "warehouseId",
+          "warehouseName",
+          "province",
+          "onHand",
+          "reserved",
+          "available"
+        ],
+        "title": "WarehouseStock",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "HTTPBearer": {
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "description": "商品、SKU、价格历史、库存。风格：camelCase、裸 JSON、金额为元的字符串。（当前为接口桩）",
+    "title": "星川商城 · 商品服务 catalog",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/catalog/health": {
+      "get": {
+        "operationId": "health_catalog_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Health Catalog Health Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "健康检查（无需鉴权）",
+        "tags": [
+          "infra"
+        ]
+      }
+    },
+    "/catalog/v1/skus/{sku_id}": {
+      "get": {
+        "operationId": "get_sku_catalog_v1_skus__sku_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sku_id",
+            "required": true,
+            "schema": {
+              "title": "Sku Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SkuDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "SKU 详情",
+        "tags": [
+          "catalog"
+        ]
+      }
+    },
+    "/catalog/v1/skus/{sku_id}/inventory": {
+      "get": {
+        "operationId": "inventory_catalog_v1_skus__sku_id__inventory_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sku_id",
+            "required": true,
+            "schema": {
+              "title": "Sku Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "province",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Province"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InventoryResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "库存",
+        "tags": [
+          "catalog"
+        ]
+      }
+    },
+    "/catalog/v1/skus/{sku_id}/price-history": {
+      "get": {
+        "operationId": "price_history_catalog_v1_skus__sku_id__price_history_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "sku_id",
+            "required": true,
+            "schema": {
+              "title": "Sku Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "起始日期 YYYY-MM-DD",
+            "in": "query",
+            "name": "from",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "起始日期 YYYY-MM-DD",
+              "title": "From"
+            }
+          },
+          {
+            "in": "query",
+            "name": "to",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "To"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PriceHistoryResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "价格历史（价保依赖）",
+        "tags": [
+          "catalog"
+        ]
+      }
+    },
+    "/catalog/v1/spus": {
+      "get": {
+        "operationId": "list_spus_catalog_v1_spus_get",
+        "parameters": [
+          {
+            "description": "关键词",
+            "in": "query",
+            "name": "q",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "关键词",
+              "title": "Q"
+            }
+          },
+          {
+            "in": "query",
+            "name": "categoryId",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Categoryid"
+            }
+          },
+          {
+            "in": "query",
+            "name": "cursor",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Cursor"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Limit",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpuListResponse"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "商品列表（游标分页）",
+        "tags": [
+          "catalog"
+        ]
+      }
+    },
+    "/catalog/v1/spus/{spu_id}": {
+      "get": {
+        "operationId": "get_spu_catalog_v1_spus__spu_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "spu_id",
+            "required": true,
+            "schema": {
+              "title": "Spu Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SpuDetail"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorBody"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "商品详情",
+        "tags": [
+          "catalog"
+        ]
+      }
+    },
+    "/catalog/v1/time": {
+      "get": {
+        "operationId": "sim_time_catalog_v1_time_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "仿真时间（Agent 必须从这里取“今天”，不能用系统时间）",
+        "tags": [
+          "infra"
+        ]
+      }
+    }
+  }
+}

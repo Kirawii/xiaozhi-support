@@ -50,6 +50,7 @@ class ServiceClient:
             auth=TokenAuth(get_settings().tokens[kind]),
             timeout=timeout,
             transport=transport,
+            trust_env=False,  # 服务间调用走本机/内网，不经系统代理
         )
 
     def request(self, method: str, path: str, **kwargs: Any) -> httpx.Response:

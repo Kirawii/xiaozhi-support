@@ -15,6 +15,7 @@ import httpx
 import pytest
 
 os.environ.setdefault("XC_AUTO_SETTLE_SECONDS", "0")  # 测试里关闭墙钟自动推进
+os.environ["NO_PROXY"] = "127.0.0.1,localhost"  # 本机回环不走系统代理
 
 
 @pytest.fixture(autouse=True)
@@ -65,23 +66,30 @@ def _client(base: str, kind: str) -> httpx.Client:
     from xcsim.simkit.client import TokenAuth
     from xcsim.simkit.config import get_settings
 
-    return httpx.Client(base_url=base, auth=TokenAuth(get_settings().tokens[kind]), timeout=15)
+    return httpx.Client(base_url=base, auth=TokenAuth(get_settings().tokens[kind]), timeout=15, trust_env=False, verify=False)  # http 明文，verify=False 省掉加载证书的耗时
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def client(live_server):
     """cs-agent token（学习者视角）。按路径自动选择 Bearer / X-Express-Token。"""
     with _client(live_server, "cs-agent") as c:
         yield c
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def internal_client(live_server):
     with _client(live_server, "internal") as c:
         yield c
 
 
-@pytest.fixture()
+@pytest.fixture(scope="session")
 def control_client(live_server):
     with _client(live_server, "control") as c:
+        yield c
+
+
+@pytest.fixture(scope="session")
+def anon_client(live_server):
+    """不带任何 token 的客户端。"""
+    with httpx.Client(base_url=live_server, timeout=15, trust_env=False, verify=False) as c:
         yield c

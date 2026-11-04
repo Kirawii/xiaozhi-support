@@ -1,0 +1,929 @@
+{
+  "components": {
+    "schemas": {
+      "CarrierInfo": {
+        "additionalProperties": false,
+        "properties": {
+          "carrierCode": {
+            "title": "Carriercode",
+            "type": "string"
+          },
+          "name": {
+            "title": "Name",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "statusCodes": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "title": "Statuscodes",
+            "type": "object"
+          },
+          "usage": {
+            "title": "Usage",
+            "type": "string"
+          }
+        },
+        "required": [
+          "carrierCode",
+          "name",
+          "usage",
+          "status",
+          "statusCodes"
+        ],
+        "title": "CarrierInfo",
+        "type": "object"
+      },
+      "CarriersData": {
+        "additionalProperties": false,
+        "properties": {
+          "carriers": {
+            "items": {
+              "$ref": "#/components/schemas/CarrierInfo"
+            },
+            "title": "Carriers",
+            "type": "array"
+          }
+        },
+        "required": [
+          "carriers"
+        ],
+        "title": "CarriersData",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "IncidentCreate": {
+        "additionalProperties": false,
+        "properties": {
+          "desc": {
+            "title": "Desc",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "stalled",
+              "disputed_delivery",
+              "bad_address_return",
+              "lost"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "mailNo": {
+            "title": "Mailno",
+            "type": "string"
+          },
+          "reporter": {
+            "title": "Reporter",
+            "type": "string"
+          }
+        },
+        "required": [
+          "mailNo",
+          "kind",
+          "desc",
+          "reporter"
+        ],
+        "title": "IncidentCreate",
+        "type": "object"
+      },
+      "IncidentData": {
+        "additionalProperties": false,
+        "properties": {
+          "conclusion": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Conclusion"
+          },
+          "incidentNo": {
+            "title": "Incidentno",
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "stalled",
+              "disputed_delivery",
+              "bad_address_return",
+              "lost"
+            ],
+            "title": "Kind",
+            "type": "string"
+          },
+          "mailNo": {
+            "title": "Mailno",
+            "type": "string"
+          },
+          "openedAt": {
+            "title": "Openedat",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          }
+        },
+        "required": [
+          "incidentNo",
+          "mailNo",
+          "kind",
+          "status",
+          "openedAt"
+        ],
+        "title": "IncidentData",
+        "type": "object"
+      },
+      "LogisticsEnvelope_CarriersData_": {
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CarriersData"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "errCode": {
+            "default": "0000",
+            "title": "Errcode",
+            "type": "string"
+          },
+          "errMsg": {
+            "default": "",
+            "title": "Errmsg",
+            "type": "string"
+          },
+          "success": {
+            "default": "true",
+            "title": "Success",
+            "type": "string"
+          }
+        },
+        "title": "LogisticsEnvelope[CarriersData]",
+        "type": "object"
+      },
+      "LogisticsEnvelope_IncidentData_": {
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/IncidentData"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "errCode": {
+            "default": "0000",
+            "title": "Errcode",
+            "type": "string"
+          },
+          "errMsg": {
+            "default": "",
+            "title": "Errmsg",
+            "type": "string"
+          },
+          "success": {
+            "default": "true",
+            "title": "Success",
+            "type": "string"
+          }
+        },
+        "title": "LogisticsEnvelope[IncidentData]",
+        "type": "object"
+      },
+      "LogisticsEnvelope_ParcelsData_": {
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/ParcelsData"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "errCode": {
+            "default": "0000",
+            "title": "Errcode",
+            "type": "string"
+          },
+          "errMsg": {
+            "default": "",
+            "title": "Errmsg",
+            "type": "string"
+          },
+          "success": {
+            "default": "true",
+            "title": "Success",
+            "type": "string"
+          }
+        },
+        "title": "LogisticsEnvelope[ParcelsData]",
+        "type": "object"
+      },
+      "LogisticsEnvelope_SignInfoData_": {
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/SignInfoData"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "errCode": {
+            "default": "0000",
+            "title": "Errcode",
+            "type": "string"
+          },
+          "errMsg": {
+            "default": "",
+            "title": "Errmsg",
+            "type": "string"
+          },
+          "success": {
+            "default": "true",
+            "title": "Success",
+            "type": "string"
+          }
+        },
+        "title": "LogisticsEnvelope[SignInfoData]",
+        "type": "object"
+      },
+      "LogisticsEnvelope_TraceData_": {
+        "additionalProperties": false,
+        "properties": {
+          "data": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TraceData"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "errCode": {
+            "default": "0000",
+            "title": "Errcode",
+            "type": "string"
+          },
+          "errMsg": {
+            "default": "",
+            "title": "Errmsg",
+            "type": "string"
+          },
+          "success": {
+            "default": "true",
+            "title": "Success",
+            "type": "string"
+          }
+        },
+        "title": "LogisticsEnvelope[TraceData]",
+        "type": "object"
+      },
+      "ParcelBrief": {
+        "additionalProperties": false,
+        "properties": {
+          "carrierCode": {
+            "title": "Carriercode",
+            "type": "string"
+          },
+          "currentStatus": {
+            "title": "Currentstatus",
+            "type": "string"
+          },
+          "mailNo": {
+            "title": "Mailno",
+            "type": "string"
+          }
+        },
+        "required": [
+          "mailNo",
+          "carrierCode",
+          "currentStatus"
+        ],
+        "title": "ParcelBrief",
+        "type": "object"
+      },
+      "ParcelsData": {
+        "additionalProperties": false,
+        "properties": {
+          "orderNo": {
+            "title": "Orderno",
+            "type": "string"
+          },
+          "parcels": {
+            "items": {
+              "$ref": "#/components/schemas/ParcelBrief"
+            },
+            "title": "Parcels",
+            "type": "array"
+          }
+        },
+        "required": [
+          "orderNo",
+          "parcels"
+        ],
+        "title": "ParcelsData",
+        "type": "object"
+      },
+      "SignInfoData": {
+        "additionalProperties": false,
+        "properties": {
+          "lockerInTime": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Lockerintime"
+          },
+          "mailNo": {
+            "title": "Mailno",
+            "type": "string"
+          },
+          "pickupTime": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Pickuptime"
+          },
+          "signTime": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Signtime"
+          },
+          "signType": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Signtype"
+          },
+          "signer": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Signer"
+          }
+        },
+        "required": [
+          "mailNo"
+        ],
+        "title": "SignInfoData",
+        "type": "object"
+      },
+      "TraceData": {
+        "additionalProperties": false,
+        "properties": {
+          "carrierCode": {
+            "title": "Carriercode",
+            "type": "string"
+          },
+          "currentStatus": {
+            "title": "Currentstatus",
+            "type": "string"
+          },
+          "mailNo": {
+            "title": "Mailno",
+            "type": "string"
+          },
+          "traces": {
+            "items": {
+              "$ref": "#/components/schemas/TraceItem"
+            },
+            "title": "Traces",
+            "type": "array"
+          }
+        },
+        "required": [
+          "mailNo",
+          "carrierCode",
+          "currentStatus",
+          "traces"
+        ],
+        "title": "TraceData",
+        "type": "object"
+      },
+      "TraceItem": {
+        "additionalProperties": false,
+        "description": "一条轨迹。不同承运商只填各自用到的字段，其余为 null。",
+        "properties": {
+          "acceptTime": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Accepttime"
+          },
+          "opCode": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Opcode"
+          },
+          "opDesc": {
+            "title": "Opdesc",
+            "type": "string"
+          },
+          "opSite": {
+            "title": "Opsite",
+            "type": "string"
+          },
+          "operator": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Operator"
+          },
+          "scanDate": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Scandate"
+          },
+          "statusName": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Statusname"
+          },
+          "tempC": {
+            "anyOf": [
+              {
+                "type": "number"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Tempc"
+          }
+        },
+        "required": [
+          "opDesc",
+          "opSite"
+        ],
+        "title": "TraceItem",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "APIKeyHeader": {
+        "in": "header",
+        "name": "X-Express-Token",
+        "type": "apiKey"
+      }
+    }
+  },
+  "info": {
+    "description": "轨迹、包裹、签收信息、报障。风格：camelCase 缩写，永远 HTTP 200，看 success/errCode；鉴权头 X-Express-Token；时间为北京时间字符串。（当前为接口桩）",
+    "title": "星川商城 · 物流服务 logistics",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/logistics/health": {
+      "get": {
+        "operationId": "health_logistics_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Health Logistics Health Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "健康检查（无需鉴权）",
+        "tags": [
+          "infra"
+        ]
+      }
+    },
+    "/logistics/v1/carriers": {
+      "get": {
+        "operationId": "carriers_logistics_v1_carriers_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogisticsEnvelope_CarriersData_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "承运商与状态编码表",
+        "tags": [
+          "logistics"
+        ]
+      }
+    },
+    "/logistics/v1/incidents": {
+      "post": {
+        "operationId": "create_incident_logistics_v1_incidents_post",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IncidentCreate"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogisticsEnvelope_IncidentData_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "报障（按 mailNo+kind 自然幂等）",
+        "tags": [
+          "logistics"
+        ]
+      }
+    },
+    "/logistics/v1/incidents/{incident_no}": {
+      "get": {
+        "operationId": "get_incident_logistics_v1_incidents__incident_no__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "incident_no",
+            "required": true,
+            "schema": {
+              "title": "Incident No",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogisticsEnvelope_IncidentData_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "报障单状态",
+        "tags": [
+          "logistics"
+        ]
+      }
+    },
+    "/logistics/v1/parcels": {
+      "get": {
+        "operationId": "parcels_logistics_v1_parcels_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "orderNo",
+            "required": true,
+            "schema": {
+              "title": "Orderno",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogisticsEnvelope_ParcelsData_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "订单包裹列表",
+        "tags": [
+          "logistics"
+        ]
+      }
+    },
+    "/logistics/v1/parcels/{mail_no}/sign-info": {
+      "get": {
+        "operationId": "sign_info_logistics_v1_parcels__mail_no__sign_info_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "mail_no",
+            "required": true,
+            "schema": {
+              "title": "Mail No",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "carrierCode",
+            "required": true,
+            "schema": {
+              "title": "Carriercode",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogisticsEnvelope_SignInfoData_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "签收信息",
+        "tags": [
+          "logistics"
+        ]
+      }
+    },
+    "/logistics/v1/time": {
+      "get": {
+        "operationId": "sim_time_logistics_v1_time_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "仿真时间（Agent 必须从这里取“今天”，不能用系统时间）",
+        "tags": [
+          "infra"
+        ]
+      }
+    },
+    "/logistics/v1/trace": {
+      "get": {
+        "operationId": "trace_logistics_v1_trace_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "mailNo",
+            "required": true,
+            "schema": {
+              "title": "Mailno",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "carrierCode",
+            "required": true,
+            "schema": {
+              "title": "Carriercode",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/LogisticsEnvelope_TraceData_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "APIKeyHeader": []
+          }
+        ],
+        "summary": "物流轨迹",
+        "tags": [
+          "logistics"
+        ]
+      }
+    }
+  }
+}

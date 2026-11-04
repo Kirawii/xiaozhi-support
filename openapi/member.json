@@ -1,0 +1,1567 @@
+{
+  "components": {
+    "schemas": {
+      "AddressOut": {
+        "additionalProperties": false,
+        "properties": {
+          "addressId": {
+            "title": "Addressid",
+            "type": "string"
+          },
+          "city": {
+            "title": "City",
+            "type": "string"
+          },
+          "detail": {
+            "title": "Detail",
+            "type": "string"
+          },
+          "district": {
+            "title": "District",
+            "type": "string"
+          },
+          "floor": {
+            "anyOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Floor"
+          },
+          "hasElevator": {
+            "title": "Haselevator",
+            "type": "boolean"
+          },
+          "isDefault": {
+            "title": "Isdefault",
+            "type": "boolean"
+          },
+          "isRemote": {
+            "title": "Isremote",
+            "type": "boolean"
+          },
+          "maskedPhone": {
+            "title": "Maskedphone",
+            "type": "string"
+          },
+          "province": {
+            "title": "Province",
+            "type": "string"
+          },
+          "receiver": {
+            "title": "Receiver",
+            "type": "string"
+          }
+        },
+        "required": [
+          "addressId",
+          "receiver",
+          "maskedPhone",
+          "province",
+          "city",
+          "district",
+          "detail",
+          "isRemote",
+          "hasElevator",
+          "isDefault"
+        ],
+        "title": "AddressOut",
+        "type": "object"
+      },
+      "AddressesResult": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/AddressOut"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "AddressesResult",
+        "type": "object"
+      },
+      "CouponList": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/CouponOut"
+            },
+            "title": "Items",
+            "type": "array"
+          }
+        },
+        "required": [
+          "items"
+        ],
+        "title": "CouponList",
+        "type": "object"
+      },
+      "CouponOut": {
+        "additionalProperties": false,
+        "properties": {
+          "amount": {
+            "title": "Amount",
+            "type": "number"
+          },
+          "categoryId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Categoryid"
+          },
+          "couponId": {
+            "title": "Couponid",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "templateId": {
+            "title": "Templateid",
+            "type": "string"
+          },
+          "threshold": {
+            "title": "Threshold",
+            "type": "number"
+          },
+          "usedOrderId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Usedorderid"
+          },
+          "validFrom": {
+            "title": "Validfrom",
+            "type": "string"
+          },
+          "validTo": {
+            "title": "Validto",
+            "type": "string"
+          }
+        },
+        "required": [
+          "couponId",
+          "templateId",
+          "status",
+          "kind",
+          "threshold",
+          "amount",
+          "validFrom",
+          "validTo"
+        ],
+        "title": "CouponOut",
+        "type": "object"
+      },
+      "ExpiringPoints": {
+        "additionalProperties": false,
+        "properties": {
+          "expiresAt": {
+            "title": "Expiresat",
+            "type": "string"
+          },
+          "points": {
+            "title": "Points",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "points",
+          "expiresAt"
+        ],
+        "title": "ExpiringPoints",
+        "type": "object"
+      },
+      "GrantRequest": {
+        "additionalProperties": false,
+        "properties": {
+          "reason": {
+            "title": "Reason",
+            "type": "string"
+          },
+          "templateId": {
+            "title": "Templateid",
+            "type": "string"
+          },
+          "ticketId": {
+            "title": "Ticketid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "templateId",
+          "ticketId",
+          "reason"
+        ],
+        "title": "GrantRequest",
+        "type": "object"
+      },
+      "HTTPValidationError": {
+        "properties": {
+          "detail": {
+            "items": {
+              "$ref": "#/components/schemas/ValidationError"
+            },
+            "title": "Detail",
+            "type": "array"
+          }
+        },
+        "title": "HTTPValidationError",
+        "type": "object"
+      },
+      "LedgerItem": {
+        "additionalProperties": false,
+        "properties": {
+          "availableAt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Availableat"
+          },
+          "balanceAfter": {
+            "title": "Balanceafter",
+            "type": "integer"
+          },
+          "delta": {
+            "title": "Delta",
+            "type": "integer"
+          },
+          "expiresAt": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Expiresat"
+          },
+          "happenedAt": {
+            "title": "Happenedat",
+            "type": "string"
+          },
+          "kind": {
+            "title": "Kind",
+            "type": "string"
+          },
+          "orderId": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Orderid"
+          },
+          "txnId": {
+            "title": "Txnid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "txnId",
+          "delta",
+          "kind",
+          "happenedAt",
+          "balanceAfter"
+        ],
+        "title": "LedgerItem",
+        "type": "object"
+      },
+      "LedgerPage": {
+        "additionalProperties": false,
+        "properties": {
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/LedgerItem"
+            },
+            "title": "Items",
+            "type": "array"
+          },
+          "pageNo": {
+            "title": "Pageno",
+            "type": "integer"
+          },
+          "pageSize": {
+            "title": "Pagesize",
+            "type": "integer"
+          },
+          "total": {
+            "title": "Total",
+            "type": "integer"
+          }
+        },
+        "required": [
+          "items",
+          "pageNo",
+          "pageSize",
+          "total"
+        ],
+        "title": "LedgerPage",
+        "type": "object"
+      },
+      "LookupResult": {
+        "additionalProperties": false,
+        "properties": {
+          "candidates": {
+            "items": {
+              "$ref": "#/components/schemas/UserCandidate"
+            },
+            "title": "Candidates",
+            "type": "array"
+          }
+        },
+        "required": [
+          "candidates"
+        ],
+        "title": "LookupResult",
+        "type": "object"
+      },
+      "OkEnvelope_AddressesResult_": {
+        "additionalProperties": false,
+        "properties": {
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OkErrorInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/AddressesResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "title": "OkEnvelope[AddressesResult]",
+        "type": "object"
+      },
+      "OkEnvelope_CouponList_": {
+        "additionalProperties": false,
+        "properties": {
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OkErrorInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CouponList"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "title": "OkEnvelope[CouponList]",
+        "type": "object"
+      },
+      "OkEnvelope_CouponOut_": {
+        "additionalProperties": false,
+        "properties": {
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OkErrorInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/CouponOut"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "title": "OkEnvelope[CouponOut]",
+        "type": "object"
+      },
+      "OkEnvelope_LedgerPage_": {
+        "additionalProperties": false,
+        "properties": {
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OkErrorInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LedgerPage"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "title": "OkEnvelope[LedgerPage]",
+        "type": "object"
+      },
+      "OkEnvelope_LookupResult_": {
+        "additionalProperties": false,
+        "properties": {
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OkErrorInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/LookupResult"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "title": "OkEnvelope[LookupResult]",
+        "type": "object"
+      },
+      "OkEnvelope_PointsInfo_": {
+        "additionalProperties": false,
+        "properties": {
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OkErrorInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/PointsInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "title": "OkEnvelope[PointsInfo]",
+        "type": "object"
+      },
+      "OkEnvelope_TierInfo_": {
+        "additionalProperties": false,
+        "properties": {
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OkErrorInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TierInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "title": "OkEnvelope[TierInfo]",
+        "type": "object"
+      },
+      "OkEnvelope_UserInfo_": {
+        "additionalProperties": false,
+        "properties": {
+          "error": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/OkErrorInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "ok": {
+            "default": true,
+            "title": "Ok",
+            "type": "boolean"
+          },
+          "result": {
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/UserInfo"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "title": "OkEnvelope[UserInfo]",
+        "type": "object"
+      },
+      "OkErrorInfo": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "title": "Code",
+            "type": "string"
+          },
+          "message": {
+            "title": "Message",
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message"
+        ],
+        "title": "OkErrorInfo",
+        "type": "object"
+      },
+      "PointsInfo": {
+        "additionalProperties": false,
+        "properties": {
+          "available": {
+            "title": "Available",
+            "type": "integer"
+          },
+          "expiringSoon": {
+            "items": {
+              "$ref": "#/components/schemas/ExpiringPoints"
+            },
+            "title": "Expiringsoon",
+            "type": "array"
+          },
+          "pending": {
+            "title": "Pending",
+            "type": "integer"
+          },
+          "userId": {
+            "title": "Userid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "userId",
+          "available",
+          "pending",
+          "expiringSoon"
+        ],
+        "title": "PointsInfo",
+        "type": "object"
+      },
+      "TierInfo": {
+        "additionalProperties": false,
+        "properties": {
+          "advanceRefundSuspendedUntil": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Advancerefundsuspendeduntil"
+          },
+          "assessedAt": {
+            "title": "Assessedat",
+            "type": "string"
+          },
+          "nextAssessAt": {
+            "title": "Nextassessat",
+            "type": "string"
+          },
+          "spendYuan": {
+            "title": "Spendyuan",
+            "type": "number"
+          },
+          "thresholds": {
+            "$ref": "#/components/schemas/TierThresholds"
+          },
+          "tier": {
+            "title": "Tier",
+            "type": "string"
+          },
+          "userId": {
+            "title": "Userid",
+            "type": "string"
+          },
+          "windowFrom": {
+            "title": "Windowfrom",
+            "type": "string"
+          },
+          "windowTo": {
+            "title": "Windowto",
+            "type": "string"
+          }
+        },
+        "required": [
+          "userId",
+          "tier",
+          "assessedAt",
+          "windowFrom",
+          "windowTo",
+          "spendYuan",
+          "nextAssessAt",
+          "thresholds"
+        ],
+        "title": "TierInfo",
+        "type": "object"
+      },
+      "TierThresholds": {
+        "additionalProperties": false,
+        "properties": {
+          "gold": {
+            "title": "Gold",
+            "type": "number"
+          },
+          "silver": {
+            "title": "Silver",
+            "type": "number"
+          }
+        },
+        "required": [
+          "silver",
+          "gold"
+        ],
+        "title": "TierThresholds",
+        "type": "object"
+      },
+      "UserCandidate": {
+        "additionalProperties": false,
+        "properties": {
+          "maskedName": {
+            "title": "Maskedname",
+            "type": "string"
+          },
+          "maskedPhone": {
+            "title": "Maskedphone",
+            "type": "string"
+          },
+          "tier": {
+            "title": "Tier",
+            "type": "string"
+          },
+          "userId": {
+            "title": "Userid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "userId",
+          "maskedName",
+          "maskedPhone",
+          "tier"
+        ],
+        "title": "UserCandidate",
+        "type": "object"
+      },
+      "UserInfo": {
+        "additionalProperties": false,
+        "properties": {
+          "birthday": {
+            "anyOf": [
+              {
+                "type": "string"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Birthday"
+          },
+          "gender": {
+            "title": "Gender",
+            "type": "string"
+          },
+          "maskedEmail": {
+            "title": "Maskedemail",
+            "type": "string"
+          },
+          "maskedName": {
+            "title": "Maskedname",
+            "type": "string"
+          },
+          "maskedPhone": {
+            "title": "Maskedphone",
+            "type": "string"
+          },
+          "registeredAt": {
+            "title": "Registeredat",
+            "type": "string"
+          },
+          "status": {
+            "title": "Status",
+            "type": "string"
+          },
+          "tier": {
+            "title": "Tier",
+            "type": "string"
+          },
+          "userId": {
+            "title": "Userid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "userId",
+          "maskedName",
+          "maskedPhone",
+          "maskedEmail",
+          "gender",
+          "registeredAt",
+          "tier",
+          "status"
+        ],
+        "title": "UserInfo",
+        "type": "object"
+      },
+      "ValidationError": {
+        "properties": {
+          "ctx": {
+            "title": "Context",
+            "type": "object"
+          },
+          "input": {
+            "title": "Input"
+          },
+          "loc": {
+            "items": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "integer"
+                }
+              ]
+            },
+            "title": "Location",
+            "type": "array"
+          },
+          "msg": {
+            "title": "Message",
+            "type": "string"
+          },
+          "type": {
+            "title": "Error Type",
+            "type": "string"
+          }
+        },
+        "required": [
+          "loc",
+          "msg",
+          "type"
+        ],
+        "title": "ValidationError",
+        "type": "object"
+      }
+    },
+    "securitySchemes": {
+      "HTTPBearer": {
+        "scheme": "bearer",
+        "type": "http"
+      }
+    }
+  },
+  "info": {
+    "description": "用户、地址、等级、积分、优惠券。风格：camelCase，{ok,result,error} 包络，HTTP 200 与 4xx 混用（看 ok），金额为浮点数，时间为 UTC。（当前为接口桩）",
+    "title": "星川商城 · 会员服务 member",
+    "version": "0.1.0"
+  },
+  "openapi": "3.1.0",
+  "paths": {
+    "/member/health": {
+      "get": {
+        "operationId": "health_member_health_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "additionalProperties": {
+                    "type": "string"
+                  },
+                  "title": "Response Health Member Health Get",
+                  "type": "object"
+                }
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "健康检查（无需鉴权）",
+        "tags": [
+          "infra"
+        ]
+      }
+    },
+    "/member/v1/time": {
+      "get": {
+        "operationId": "sim_time_member_v1_time_get",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {}
+              }
+            },
+            "description": "Successful Response"
+          }
+        },
+        "summary": "仿真时间（Agent 必须从这里取“今天”，不能用系统时间）",
+        "tags": [
+          "infra"
+        ]
+      }
+    },
+    "/member/v1/users/lookup": {
+      "get": {
+        "operationId": "lookup_member_v1_users_lookup_get",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "phone",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Phone"
+            }
+          },
+          {
+            "in": "query",
+            "name": "phoneLast4",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Phonelast4"
+            }
+          },
+          {
+            "in": "query",
+            "name": "name",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Name"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkEnvelope_LookupResult_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkEnvelope_UserInfo_"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkEnvelope_UserInfo_"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "按手机号或（尾号+姓名）查找用户，返回打码候选",
+        "tags": [
+          "member"
+        ]
+      }
+    },
+    "/member/v1/users/{user_id}": {
+      "get": {
+        "operationId": "get_user_member_v1_users__user_id__get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "title": "User Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkEnvelope_UserInfo_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkEnvelope_UserInfo_"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkEnvelope_UserInfo_"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "用户基本信息（手机号打码）",
+        "tags": [
+          "member"
+        ]
+      }
+    },
+    "/member/v1/users/{user_id}/addresses": {
+      "get": {
+        "operationId": "addresses_member_v1_users__user_id__addresses_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "title": "User Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkEnvelope_AddressesResult_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkEnvelope_UserInfo_"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkEnvelope_UserInfo_"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "地址列表",
+        "tags": [
+          "member"
+        ]
+      }
+    },
+    "/member/v1/users/{user_id}/coupons": {
+      "get": {
+        "operationId": "coupons_member_v1_users__user_id__coupons_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "title": "User Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "status",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "title": "Status"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkEnvelope_CouponList_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkEnvelope_UserInfo_"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkEnvelope_UserInfo_"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "优惠券列表",
+        "tags": [
+          "member"
+        ]
+      }
+    },
+    "/member/v1/users/{user_id}/coupons/grant": {
+      "post": {
+        "operationId": "grant_member_v1_users__user_id__coupons_grant_post",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "title": "User Id",
+              "type": "string"
+            }
+          },
+          {
+            "description": "写接口必填的幂等键",
+            "in": "header",
+            "name": "Idempotency-Key",
+            "required": false,
+            "schema": {
+              "anyOf": [
+                {
+                  "type": "string"
+                },
+                {
+                  "type": "null"
+                }
+              ],
+              "description": "写接口必填的幂等键",
+              "title": "Idempotency-Key"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GrantRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkEnvelope_CouponOut_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkEnvelope_UserInfo_"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkEnvelope_UserInfo_"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "发放补偿券（受客服权限与额度限制）",
+        "tags": [
+          "member"
+        ]
+      }
+    },
+    "/member/v1/users/{user_id}/points": {
+      "get": {
+        "operationId": "points_member_v1_users__user_id__points_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "title": "User Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkEnvelope_PointsInfo_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkEnvelope_UserInfo_"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkEnvelope_UserInfo_"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "积分：可用、待到账、即将过期",
+        "tags": [
+          "member"
+        ]
+      }
+    },
+    "/member/v1/users/{user_id}/points/ledger": {
+      "get": {
+        "operationId": "ledger_member_v1_users__user_id__points_ledger_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "title": "User Id",
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "pageNo",
+            "required": false,
+            "schema": {
+              "default": 1,
+              "minimum": 1,
+              "title": "Pageno",
+              "type": "integer"
+            }
+          },
+          {
+            "in": "query",
+            "name": "pageSize",
+            "required": false,
+            "schema": {
+              "default": 20,
+              "maximum": 100,
+              "minimum": 1,
+              "title": "Pagesize",
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkEnvelope_LedgerPage_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkEnvelope_UserInfo_"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkEnvelope_UserInfo_"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "积分流水",
+        "tags": [
+          "member"
+        ]
+      }
+    },
+    "/member/v1/users/{user_id}/tier": {
+      "get": {
+        "operationId": "tier_member_v1_users__user_id__tier_get",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "user_id",
+            "required": true,
+            "schema": {
+              "title": "User Id",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkEnvelope_TierInfo_"
+                }
+              }
+            },
+            "description": "Successful Response"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkEnvelope_UserInfo_"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "403": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/OkEnvelope_UserInfo_"
+                }
+              }
+            },
+            "description": "Forbidden"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HTTPValidationError"
+                }
+              }
+            },
+            "description": "Validation Error"
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ],
+        "summary": "会员等级、统计窗口、消费额、下次评定",
+        "tags": [
+          "member"
+        ]
+      }
+    }
+  }
+}
