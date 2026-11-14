@@ -152,7 +152,7 @@ curl http://127.0.0.1:8000/api/v1/time -H "Authorization: Bearer agent-dev-token
 `kb-bench/knowledge_base/` 有 20 篇文档（12 篇政策、7 篇商品说明、1 篇常见问题），另有 100 道带自动评分的问答题（`kb-bench/benchmark/`）。用法见 `kb-bench/README.md`。
 
 - 校验：`cd kb-bench && uv run python scripts/bench.py validate`
-- 接口的规则校验和知识库数字来自同一份 `policy/policy.yaml`。
+- 接口的规则校验读 `policy/policy.yaml`，它的数字按这套知识库整理，两边一致；改规则时两处要同步修改。
 
 ## 数据规模
 
