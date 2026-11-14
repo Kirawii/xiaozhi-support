@@ -244,7 +244,11 @@ def _create_refund(o: dict, case: dict | None, amount: int, *, advance: bool = F
 
 
 @app.post("/api/v1/orders/{order_id}/cancel", dependencies=[Depends(require_agent)], tags=["订单"], summary="取消订单（未发货）")
-def cancel_order(order_id: str, body: dict):
+def cancel_order(order_id: str, body: dict, idempotency_key: str | None = Header(default=None)):
+    return idempotent(f"cancel:{order_id}", idempotency_key, body, lambda: _cancel_order(order_id, body))
+
+
+def _cancel_order(order_id: str, body: dict):
     o = get_order(order_id, body.get("user_id", ""))
     st = w().order_status(o)
     if st == "cancelled":
@@ -262,7 +266,11 @@ def cancel_order(order_id: str, body: dict):
 
 
 @app.post("/api/v1/orders/{order_id}/address", dependencies=[Depends(require_agent)], tags=["订单"], summary="修改收货地址（未发货，限一次）")
-def change_address(order_id: str, body: dict):
+def change_address(order_id: str, body: dict, idempotency_key: str | None = Header(default=None)):
+    return idempotent(f"address:{order_id}", idempotency_key, body, lambda: _change_address(order_id, body))
+
+
+def _change_address(order_id: str, body: dict):
     o = get_order(order_id, body.get("user_id", ""))
     st = w().order_status(o)
     if st not in ("pending_payment", "paid"):
@@ -317,9 +325,43 @@ def _reject(code: str, message: str, **detail):
     raise ApiError(422, code, message, detail)
 
 
+def idempotent(scope: str, key: str | None, body: dict, fn):
+    """写接口的通用幂等：同键同参返回第一次的结果；同键异参返回 422。不带键时照常执行。"""
+    if not key:
+        return fn()
+    fp = hashlib.sha256(json.dumps(body, sort_keys=True, ensure_ascii=False).encode()).hexdigest()
+    saved = STATE["idem"].get((scope, key))
+    if saved:
+        if saved["fp"] != fp:
+            raise ApiError(422, "IDEMPOTENCY_KEY_REUSED", "同一个幂等键不能用于不同的请求")
+        return JSONResponse(saved["body"], status_code=saved["status"], headers={"Idempotent-Replayed": "true"})
+    resp = fn()
+    if resp.status_code < 300:
+        STATE["idem"][(scope, key)] = {"fp": fp, "body": json.loads(resp.body), "status": resp.status_code}
+    return resp
+
+
+@app.post("/api/v1/identity/verify", dependencies=[Depends(require_agent)], tags=["会员"],
+          summary="身份核验：订单号 + 收货手机号后 4 位（与教程 verify_identity 一致）")
+def verify_identity(body: dict):
+    o = w().orders.get(str(body.get("order_id", "")))
+    last4 = str(body.get("phone_last4", ""))
+    if not o or o["created_at"] > now() or len(last4) != 4:
+        return ok({"verified": False, "user_id": None})
+    u = w().users[o["user_id"]]
+    hit = last4 in (u["phone"][-4:], o["address"]["phone"][-4:])
+    return ok({"verified": hit, "user_id": u["user_id"] if hit else None, "name": u["name"] if hit else None})
+
+
 @app.post("/api/v1/aftersales", dependencies=[Depends(require_agent)], tags=["售后"], status_code=201,
-          summary="提交售后申请：return_7day / size_exchange / quality_refund / quality_exchange / quality_repair / wrong_missing / fresh_claim")
-def create_aftersale(body: dict):
+          summary="提交售后申请（可带 Idempotency-Key；body 里 dry_run=true 时只校验和试算、不创建，用于两阶段确认）")
+def create_aftersale(body: dict, idempotency_key: str | None = Header(default=None)):
+    if body.get("dry_run"):
+        return _create_aftersale(body, dry_run=True)
+    return idempotent("aftersale", idempotency_key, body, lambda: _create_aftersale(body, dry_run=False))
+
+
+def _create_aftersale(body: dict, dry_run: bool):
     wd = w()
     uid, ctype = body.get("user_id", ""), body.get("type")
     o = get_order(body.get("order_id", ""), uid)
@@ -404,6 +446,10 @@ def create_aftersale(body: dict):
                  "cold_chain_refunded": fr.cold_chain_refunded, "status": "approved"}
 
     case["manual_review_required"] = needs_manual_review(case["refund_amount"])
+    if dry_run:  # 预检：规则全部通过，返回试算结果，不写入任何数据
+        preview = case | {"case_id": None, "order_id": o["order_id"], "item_id": item["item_id"], "user_id": uid,
+                          "created_at": None, "dry_run": True}
+        return ok(_case_view(preview))
     cid = "AS" + wd.next_id("C", 8)[1:]
     case |= {"case_id": cid, "user_id": uid, "order_id": o["order_id"], "item_id": item["item_id"],
              "reason": body.get("reason", ""), "created_at": n, "withdrawn_at": None, "return_mail_no": None}

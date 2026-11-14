@@ -41,6 +41,11 @@ def test_scenario_check(client, sid, monkeypatch):
         body = r.json() if "success" not in r.text[:20] else r.json()
         for path, want in chk["expect"].items():
             assert _dig(body, path) == want, (path, r.text)
+    # 参考答案执行后，场景的数据库断言必须成立（保证断言本身是对的）
+    for a in s["expected"]["db_assertions"]:
+        method, path = a["call"].split(" ", 1)
+        got = _dig(client.request(method, path, headers=AG).json(), a["path"])
+        assert (len(got) if a["op"] == "len_eq" else got) == a["value"], (sid, a)
 
 
 def test_scenario_users_have_no_future_records(client):
@@ -136,3 +141,47 @@ def test_fiction_phone_and_brands():
     blob = repr([w.spus, w.users, w.parcels])
     for bad in ("微信", "支付宝", "顺丰", "京东", "华为", "小米", "苹果"):
         assert bad not in blob
+
+
+def test_scenarios_follow_tutorial_format():
+    for s in World.build(background=False).scenarios.values():
+        assert {"persona", "knows", "goal", "hidden_rules"} <= set(s["user_profile"])
+        assert {"must_mention", "forbidden_tools", "db_assertions", "max_turns"} <= set(s["expected"])
+        assert s["order_id"].startswith("ORD-")
+
+
+def test_dry_run_creates_nothing(client):
+    s = client.post("/control/scenarios/RTA-01/prepare", headers=CT).json()["data"]
+    body = s["check"]["body"] | {"dry_run": True}
+    r = client.post("/api/v1/aftersales", json=body, headers=AG)
+    assert r.status_code == 200 and r.json()["data"]["refund_preview"] == "378.00" and r.json()["data"]["dry_run"]
+    listed = client.get(f"/api/v1/aftersales?user_id={body['user_id']}&order_id={body['order_id']}", headers=AG)
+    assert listed.json()["data"]["items"] == []
+    bad = client.post("/control/scenarios/RET-02/prepare", headers=CT).json()["data"]
+    r = client.post("/api/v1/aftersales", json=bad["check"]["body"] | {"dry_run": True}, headers=AG)
+    assert r.status_code == 422 and r.json()["code"] == "AS_WINDOW_EXPIRED"
+
+
+def test_aftersale_idempotency_key(client):
+    s = client.post("/control/scenarios/RET-10/prepare", headers=CT).json()["data"]
+    body, h = s["check"]["body"], AG | {"Idempotency-Key": "ret-1"}
+    a = client.post("/api/v1/aftersales", json=body, headers=h)
+    b = client.post("/api/v1/aftersales", json=body, headers=h)
+    assert a.status_code == b.status_code == 201 and b.headers.get("Idempotent-Replayed") == "true"
+    assert a.json()["data"]["case_id"] == b.json()["data"]["case_id"]
+    items = client.get(f"/api/v1/aftersales?user_id={body['user_id']}&order_id={body['order_id']}", headers=AG)
+    assert len(items.json()["data"]["items"]) == 1
+    assert client.post("/api/v1/aftersales", json=body | {"reason": "x"}, headers=h).status_code == 422
+
+
+def test_identity_verify(client):
+    s = client.post("/control/scenarios/IDV-01/prepare", headers=CT).json()["data"]
+    w = A.w()
+    namesakes = [u for u in w.users.values() if u["name"] == "王芳"]
+    assert len(namesakes) >= 2
+    good = s["check"]["body"]
+    assert client.post("/api/v1/identity/verify", json=good, headers=AG).json()["data"]["verified"] is True
+    other = next(u for u in namesakes if u["user_id"] != s["user_id"])
+    wrong = good | {"phone_last4": other["phone"][-4:]}
+    if other["phone"][-4:] != good["phone_last4"]:
+        assert client.post("/api/v1/identity/verify", json=wrong, headers=AG).json()["data"]["verified"] is False

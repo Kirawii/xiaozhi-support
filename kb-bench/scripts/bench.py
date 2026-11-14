@@ -118,6 +118,14 @@ def load_questions(path: Path) -> list[dict]:
     return data["questions"]
 
 
+def select_split(questions: list[dict], split: str | None) -> list[dict]:
+    """dev = 奇数题号，test = 偶数题号，all = 全部。调参只用 dev，test 只在最终报告时跑一次。"""
+    if not split or split == "all":
+        return questions
+    want = 1 if split == "dev" else 0
+    return [q for q in questions if int(str(q["id"]).lstrip("Qq")) % 2 == want]
+
+
 def load_jsonl(path: Path) -> dict[str, dict]:
     rows: dict[str, dict] = {}
     with path.open(encoding="utf-8") as f:
@@ -241,7 +249,7 @@ def cmd_validate(args) -> int:
 # ---------------------------------------------------------------- 命令：template / export-reference
 
 def cmd_template(args) -> int:
-    questions = load_questions(Path(args.questions))
+    questions = select_split(load_questions(Path(args.questions)), args.split)
     rows = [{"id": q["id"], "question": q["question"], "answer": "", "retrieved": []} for q in questions]
     write_jsonl(Path(args.out), rows)
     print(f"已写入 {len(rows)} 行模板：{args.out}")
@@ -264,7 +272,7 @@ def _pct(x: float) -> str:
 
 
 def cmd_score(args) -> int:
-    questions = load_questions(Path(args.questions))
+    questions = select_split(load_questions(Path(args.questions)), args.split)
     preds = load_jsonl(Path(args.pred))
     judge = load_jsonl(Path(args.judge)) if args.judge else {}
     ks = sorted({int(k) for k in args.k.split(",")})
@@ -449,7 +457,7 @@ def parse_verdict(text: str) -> dict:
 
 
 def cmd_judge(args) -> int:
-    questions = load_questions(Path(args.questions))
+    questions = select_split(load_questions(Path(args.questions)), args.split)
     preds = load_jsonl(Path(args.pred))
     if args.limit:
         questions = questions[: args.limit]
@@ -490,6 +498,26 @@ def cmd_judge(args) -> int:
     return 0
 
 
+def cmd_passk(args) -> int:
+    """同一套题跑 k 次（k 个预测文件），统计 pass^1（平均通过率）、pass^k（k 次全部通过）和时对时错的题。"""
+    questions = select_split(load_questions(Path(args.questions)), args.split)
+    runs = [load_jsonl(Path(p)) for p in args.pred]
+    k = len(runs)
+    per_q = {}
+    for q in questions:
+        per_q[q["id"]] = [score_answer(q, (r.get(q["id"], {}).get("answer") or ""))["passed"] for r in runs]
+    n = len(per_q) or 1
+    pass1 = sum(sum(v) for v in per_q.values()) / (n * k)
+    passk = sum(all(v) for v in per_q.values()) / n
+    flaky = [qid for qid, v in per_q.items() if any(v) and not all(v)]
+    never = [qid for qid, v in per_q.items() if not any(v)]
+    print(f"题目数：{len(per_q)}，运行次数 k = {k}（规则评分）")
+    print(f"pass^1 = {pass1:.1%}    pass^{k} = {passk:.1%}")
+    print(f"时对时错（{len(flaky)} 题）：{', '.join(flaky) or '无'}")
+    print(f"全部答错（{len(never)} 题）：{', '.join(never) or '无'}")
+    return 0
+
+
 # ---------------------------------------------------------------- 入口
 
 def main(argv=None) -> int:
@@ -502,6 +530,7 @@ def main(argv=None) -> int:
 
     p = sub.add_parser("template", help="生成预测文件模板")
     p.add_argument("--out", required=True)
+    p.add_argument("--split", choices=["dev", "test", "all"], default="all", help="dev=奇数题号，test=偶数题号")
 
     p = sub.add_parser("export-reference", help="把参考答案导出为预测文件（用于自测评分脚本）")
     p.add_argument("--out", required=True)
@@ -512,6 +541,7 @@ def main(argv=None) -> int:
     p.add_argument("--k", default="1,3,5", help="检索指标的 k 值，逗号分隔")
     p.add_argument("--report", help="Markdown 报告输出路径")
     p.add_argument("--json", help="逐题明细 JSON 输出路径")
+    p.add_argument("--split", choices=["dev", "test", "all"], default="all", help="dev=奇数题号，test=偶数题号")
 
     p = sub.add_parser("judge", help="用大模型裁判逐题打分")
     p.add_argument("--pred", required=True)
@@ -520,10 +550,15 @@ def main(argv=None) -> int:
     p.add_argument("--limit", type=int, help="只评前 N 道题")
     p.add_argument("--overwrite", action="store_true", help="忽略已有结果，从头开始")
     p.add_argument("--dry-run", action="store_true", help="只打印裁判提示词，不调用模型")
+    p.add_argument("--split", choices=["dev", "test", "all"], default="all", help="dev=奇数题号，test=偶数题号")
+
+    p = sub.add_parser("passk", help="稳定性：同一套题的 k 次运行结果，输出 pass^k 和时对时错的题")
+    p.add_argument("--pred", nargs="+", required=True, help="k 个预测文件")
+    p.add_argument("--split", choices=["dev", "test", "all"], default="all", help="dev=奇数题号，test=偶数题号")
 
     args = ap.parse_args(argv)
     handlers = {"validate": cmd_validate, "template": cmd_template, "export-reference": cmd_export_reference,
-                "score": cmd_score, "judge": cmd_judge}
+                "score": cmd_score, "judge": cmd_judge, "passk": cmd_passk}
     return handlers[args.cmd](args)
 
 

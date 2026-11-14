@@ -1,0 +1,11 @@
+# 单独启动：docker compose up
+# 接入你自己的项目：把下面的 xingchuan 服务复制到你的 docker-compose.yml，
+# 你的服务里用 http://xingchuan:8000 访问。
+services:
+  xingchuan:
+    build: .
+    ports:
+      - "8000:8000"
+    environment:
+      XC_AGENT_TOKEN: agent-dev-token
+      XC_CONTROL_TOKEN: control-dev-token

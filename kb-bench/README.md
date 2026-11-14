@@ -139,3 +139,10 @@ python scripts/bench.py score --pred predictions.jsonl --judge judge.jsonl --rep
 3. 运行 `python scripts/bench.py validate` 和 `python -m pytest tests -q`，全部通过后再使用。
 
 修改规则时要同步修改所有相关文档：例如改了退货期限，P01、F01、相关商品说明和对应题目都要检查。`validate` 能发现出处原文不一致，但发现不了两篇文档之间的规则矛盾，这需要人工核对。
+
+## 开发集、测试集与稳定性（与教程对应）
+
+- `template`、`score`、`judge`、`passk` 都支持 `--split dev|test|all`：dev 为奇数题号（50 道），test 为偶数题号（50 道），默认 all。调参只用 dev，test 只在最终报告时运行一次。
+- 稳定性：同一套题跑 k 次，`python scripts/bench.py passk --split dev --pred run1.jsonl run2.jsonl run3.jsonl run4.jsonl`，输出 pass^1、pass^k、时对时错的题和全部答错的题（按规则评分）。
+
+> 本副本中的真实品牌已替换为虚构名：悦付、青禾钱包、星联家居协议。

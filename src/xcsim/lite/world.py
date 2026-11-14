@@ -144,8 +144,9 @@ class World:
         ship: None 表示未发货；否则为 {parcels: [{items:[下标], shipped_at, ...轨迹参数}]}，
         省略 parcels 时所有商品同一个包裹。
         """
-        oid = "XC" + (paid_at or created_at or self.anchor).strftime("%y%m%d") + self.next_id("O", 6)[1:]
         created_at = created_at or (paid_at - timedelta(minutes=self.rng.randint(1, 20)) if paid_at else self.anchor)
+        day = created_at.astimezone(BJ).strftime("%Y%m%d")
+        oid = f"ORD-{day}-{self.next_id('D' + day, 4)[len(day) + 1:]}"  # 与教程一致：ORD-20261020-0001
         lines = []
         for idx, it in enumerate(items):
             sku = self.skus.get(it["sku_id"]) if not it.get("is_gift") else None

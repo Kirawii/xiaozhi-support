@@ -39,12 +39,13 @@ curl http://127.0.0.1:8000/api/v1/time -H "Authorization: Bearer agent-dev-token
 
 失败时返回 HTTP 4xx/5xx，响应体为 `{"code": "错误码", "message": "说明", "detail": {...}}`。
 
-金额是字符串，单位元（如 `"99.00"`）；时间是带 `+08:00` 的 ISO 格式。
+金额是字符串，单位元（如 `"99.00"`）；时间是带 `+08:00` 的 ISO 格式；订单号格式为 `ORD-20261020-0001`。
 
 | 方法与路径 | 作用 |
 |---|---|
 | `GET /api/v1/time` | 仿真当前时间、人工客服是否在线 |
-| `GET /api/v1/users/lookup?phone=` 或 `?phone_last4=&name=` | 核验身份、查找用户 |
+| `POST /api/v1/identity/verify` | 身份核验：`{order_id, phone_last4}`，返回 `verified` 和 `user_id`（对应教程的 `verify_identity`） |
+| `GET /api/v1/users/lookup?phone=` 或 `?phone_last4=&name=` | 查找用户 |
 | `GET /api/v1/users/{user_id}` | 会员等级、积分、默认地址 |
 | `GET /api/v1/products?q=`、`GET /api/v1/products/{spu_id}` | 商品、现价、价格类型、详情页售后说明 |
 | `GET /api/v1/orders?user_id=` | 订单列表 |
@@ -52,7 +53,7 @@ curl http://127.0.0.1:8000/api/v1/time -H "Authorization: Bearer agent-dev-token
 | `POST /api/v1/orders/{order_id}/cancel` | 取消订单（未发货） |
 | `POST /api/v1/orders/{order_id}/address` | 修改地址（未发货，限一次） |
 | `GET /api/v1/logistics/{mail_no}` | 物流轨迹，**第三方风格**（见下文） |
-| `POST /api/v1/aftersales` | 售后申请，**服务端强校验规则** |
+| `POST /api/v1/aftersales` | 售后申请，**服务端强校验规则**；body 加 `"dry_run": true` 只校验和试算、不创建 |
 | `GET /api/v1/aftersales?user_id=` | 售后单列表 |
 | `POST /api/v1/aftersales/{case_id}/withdraw` | 撤销（仍计入申请次数） |
 | `POST /api/v1/aftersales/{case_id}/return-shipment` | 登记寄回单号；金星会员满足条件时自动先行退款 |
@@ -91,7 +92,9 @@ curl http://127.0.0.1:8000/api/v1/time -H "Authorization: Bearer agent-dev-token
 - `AS_OPTION_NOT_AVAILABLE`：当前时段不支持该处理方式
 - `AS_FRESH_CLAIM_EXPIRED`：生鲜超过 24 小时
 
-**没有“预检”接口。** Agent 应该先依据知识库和订单数据自己判断，再提交。
+**预检（`dry_run`）**：用于教程阶段 4 的两阶段确认。先带 `"dry_run": true` 调用，规则不通过返回同样的 422；通过则返回试算结果（退款金额、截止时间、是否需要人工复核），不写入任何数据。用户确认后再去掉 `dry_run` 正式提交。预检只是“试一下”，规则判断和向用户解释仍然是 Agent 的工作。
+
+**幂等键**：售后、取消订单、修改地址可带 `Idempotency-Key` 头，同键同参返回第一次的结果（响应头 `Idempotent-Replayed: true`），同键异参返回 422；退款**必须**带。
 
 ### 退款是异步的
 
@@ -123,29 +126,36 @@ curl http://127.0.0.1:8000/api/v1/time -H "Authorization: Bearer agent-dev-token
 
 ## 命名场景：评测你的 Agent
 
-`scenarios.yaml` 有 66 个场景，覆盖：
+`scenarios.yaml` 有 78 个场景，格式对应教程阶段 12。每个场景有专属用户和订单：
 
-- 七天无理由的边界（第 7 天 23:30、驿站入站时间、申请次数、拆封或激活、详情页优先）
-- 退款金额分摊、换码
-- 质量问题分档、错发 48 小时、检测报告门槛
-- 生鲜 24 小时与坏果率
-- 运费边界（99 元、偏远 199 元、大件、金星）
-- 退款（2000 元复核、金星 500 元先行退款、失败、超时但已成功、重复申请）
-- 价保、物流异常、取消与改地址、新旧规则过渡、转人工、越权查询、服务故障
+| 字段 | 含义 |
+|---|---|
+| `opening_utterance` | 用户开口的第一句话 |
+| `user_profile` | 给用户模拟器的人设 `persona`、已知信息 `knows`（订单号、手机尾号、姓名）、目标 `goal`、只在被问到时才说的 `hidden_rules` |
+| `expected.summary` | 期望的正确处理 |
+| `expected.must_mention` | 回复中必须出现的关键信息 |
+| `expected.forbidden_tools` | 不该调用的工具（按教程的工具名，如 `create_return_request`） |
+| `expected.db_assertions` | 对话结束后用接口核验数据状态，例如“这个订单不应产生售后单”：`{call, path, op: len_eq / eq, value}` |
+| `tutorial_category` | 教程的场景分类：正常办理、规则边界、信息不全或模糊、多诉求、对抗、应转人工，另有依赖故障（阶段 16） |
+| `check` | 环境自测用的参考调用（相当于“标准答案”的一步），不要给 Agent 看 |
 
-每个场景有专属用户和订单，包括：
-
-- `opening_utterance`：用户开口的第一句话
-- `expected`：期望的正确处理
-- `check`：一个可自动核验的接口调用
-
-评测一个场景的流程：
-
-1. `POST /control/scenarios/RET-05/prepare`
-2. 让你的 Agent 以 `user_id` 身份接待 `opening_utterance`
-3. 对照 `expected` 评判回答，必要时用接口检查数据状态
+评测一个场景：`POST /control/scenarios/RET-05/prepare` → 用户模拟器按 `user_profile` 与你的 Agent 对话 → 按 `expected` 打分（数据库断言 + 必须告知 + 禁用工具）。
 
 重新导出场景：`uv run xcsim scenarios`。
+
+## 与教程《从零构建工业级 Agent 客服系统》的对应
+
+本环境扮演教程里“业务中台”的角色：订单、退款、物流等业务数据和规则校验由它提供，你的 Agent 通过 HTTP 调用。
+
+| 教程阶段 | 怎么用本环境 |
+|---|---|
+| 阶段 2 业务领域与数据层 | 不再自己建业务表和种子数据。`services/` 写成调用本环境的客户端（防腐层）：把 HTTP 错误码转换成你的业务异常（如 `AS_WINDOW_EXPIRED` → `ReturnWindowExpired`），把元字符串转成整数分。规则仍要读懂并写进 `docs/policy.md`：提示词和评测都要用。幂等键、注入时钟（读 `/api/v1/time`）照样要做 |
+| 阶段 4 工具 | 教程的 9 个工具对应：`verify_identity` → `POST /identity/verify`；`list_recent_orders`、`get_order` → 订单接口；`get_shipment` → 物流接口（注意第三方风格）；`cancel_order`、`update_shipping_address`、`create_return_request` → 对应写接口（两阶段确认用 `dry_run` 预检）；`transfer_to_human` → 工单接口 |
+| 阶段 7 护栏 | 身份核验用订单号 + 手机尾号；场景里有同名不同人、用他人订单号核验、冒充主管等对抗用例 |
+| 阶段 8 RAG | 用 `kb-bench/`：`bench.py template/score/judge --split dev`，最终在 `--split test` 跑一次 |
+| 阶段 12 评测 | 用 `scenarios.yaml` 和控制接口；知识问答稳定性用 `bench.py passk --pred run1.jsonl run2.jsonl ...` |
+| 阶段 13 部署 | 把 `docker-compose.yml` 里的 `xingchuan` 服务加到你的 compose 中，你的服务用 `http://xingchuan:8000` 访问 |
+| 阶段 16 失败处理 | 用故障注入：退款 `timeout_after_commit`（超时但已成功）、物流持续 503、订单接口 429，正好对应教程的“结果不确定的写操作”和熔断降级 |
 
 ## 知识库
 
@@ -157,8 +167,14 @@ curl http://127.0.0.1:8000/api/v1/time -H "Authorization: Bearer agent-dev-token
 ## 数据规模
 
 - 普通用户 300 个、普通订单约 1,500 单，覆盖最近 18 个月，含大促波动、拆单、赠品、分期、组合优惠和物流异常。
-- 另有 66 个场景各自的专属用户和订单。
+- 另有 78 个场景各自的专属用户和订单。
 - 同一种子生成的数据完全相同。
+
+## Docker
+
+```bash
+docker compose up
+```
 
 ## 测试
 
